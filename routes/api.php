@@ -18,10 +18,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::post('/sendData', [WateringControler::class, 'store']);
-Route::post('/getData', [WateringControler::class,'show']);
+Route::get('/getData', [WateringControler::class,'show']);
 Route::get('/getStatus', [WateringControler::class,'status']);
 Route::post('/switch', [WateringControler::class,'switch']);
 Route::get('/sensorStatus', [WateringControler::class,'sensor']);
 Route::post('/setSensorStatus', [WateringControler::class,'setSensor']);
 Route::get('/waterUsage',[WateringControler::class,'computeUsage']);
-
+Route::post('/waterlvl', [WateringControler::class,'waterlvlmonitoring']);

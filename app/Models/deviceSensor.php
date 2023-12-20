@@ -14,6 +14,9 @@ class deviceSensor extends Model
         'moisture',
         'waterlvl',
         'network',
+        'id',
+        'state',
+        
     ];
     public $timestamps = false;
 }

@@ -14,5 +14,5 @@ class deviceData extends Model
         "state",
         "date",
     ];
-
+public $timestamps = false;
 }

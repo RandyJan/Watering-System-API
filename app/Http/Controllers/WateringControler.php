@@ -32,18 +32,20 @@ class WateringControler extends Controller
     {
         $dateget = Carbon::now();
         $date = $dateget->format('Y-m-d');
-        $response = deviceData::insert([
-            "usage"=> $request->usage,
-            "state"=>0,
-            "date"=>$date
-        ]);
-        // $test = "T";
-        if(!$response){
+        $datetoday = deviceData::where('date', $date)->max('usage');
+        $usageinc = $datetoday + 1;
+        if(empty($datetoday)){
+            deviceData::insert([
+                "usage"=> $request->usage,
+                "date"=>$date]);
+        }
+        else{
+deviceData::where("date", $date)->update(['usage'=>$usageinc]);
+        }
+        Log::info($usageinc);
+        return response()->json("added liter successfuly");
 
-        return response('off');
-    }
 
-    return response("on");
     }
     /**
      * Display the specified resource.
@@ -53,15 +55,15 @@ class WateringControler extends Controller
      */
     public function status(Request $request)
     {
-        $response = state::first();
+        $response = deviceSensor::first('state');
 
-        if($response->state == 0)
-        {
-            return response("off");
-        }
-        else{
-            return response("on");
-        }
+        // if($response->state == 0)
+        // {
+        //     return response("off");
+        // }
+        // else{
+            return response($response->state);
+        // }
 
     }
 
@@ -76,7 +78,7 @@ class WateringControler extends Controller
     {
         // $ip = $request->ip();
         $data = json_decode($request['state']);
-        $response = state::where('state', 0)->orwhere('state',1)->update(['state' => $data]);
+        $response = deviceSensor::where('id',10)->update(['state' => $data]);
         // if(!$response){
         //     return response()->json(["Something went wrong"]);
         // }
@@ -107,17 +109,18 @@ class WateringControler extends Controller
 public function sensor(){
 
    $sensorStatus = deviceSensor::all();
-    return response($sensorStatus->all());
+    return response()->json($sensorStatus->all());
 }
 public function setSensor(Request $request)
 {
     $network = 11;
-    deviceSensor::update([
-        'pump'=>$request->pump,
+   $response = deviceSensor::where('network', 1)->update([
+        'pump'=>$request->relay,
         'moisture'=>$request->moisture,
-        'network'=>$network,
-        'waterlvl'=> $request->moisture,
+        'waterlvl'=> $request->floating,
     ]);
+    Log::info($request->all());
+    return response()->json($response);
 }
 public function computeUsage(){
     $datenow = Carbon::now();
@@ -128,5 +131,22 @@ Log::info($response);
 return response()->json([
     "water_consumption"=>$response
 ]);
+}
+public function waterlvlmonitoring(Request $request){
+    // $test =json_encode($request['floatsensor'],true);
+    $test2 = json_decode($request['floatsensor']);
+    // $test3 = json_decode($test2,true);
+    $response = deviceSensor::where('id', 10)->update([
+        'pump'=>$request->relay,
+        'moisture'=>$request->moisture,
+        'waterlvl'=> $request->floating,
+    ]);
+    Log::info($request->all());
+        if(!$response){
+            return response("network failure");
+        }
+        else{
+            // return response("sensor is being monitored");
+        }
 }
 }
