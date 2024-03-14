@@ -11,7 +11,9 @@ class deviceSensor extends Model
     protected $table = 'Device_Sensor';
     protected $fillable = [
         'pump',
-        'moisture',
+        'moisture1',
+        'moisture2',
+        'moisture3',
         'waterlvl',
         'network',
         'id',
