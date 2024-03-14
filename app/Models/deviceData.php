@@ -10,7 +10,9 @@ class deviceData extends Model
     use HasFactory;
     protected $table = "Device_Data";
     protected $fillable = [
-        "usage",
+        "soiusage1",
+        "soiusage2",
+        "soiusage3",
         "state",
         "date",
     ];

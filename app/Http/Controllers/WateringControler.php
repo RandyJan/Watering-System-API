@@ -32,18 +32,30 @@ class WateringControler extends Controller
     {
         $dateget = Carbon::now();
         $date = $dateget->format('Y-m-d');
-        $datetoday = deviceData::where('date', $date)->max('usage');
-        $usageinc = $datetoday + 1;
-        if(empty($datetoday)){
+        $presentdate = deviceData::where('date',$date)->first('date');
+        $datetodayA = deviceData::where('date', $date)->max('soilusage1');
+        $usageincA = $request->soilusage1 == 1 ? $datetodayA + 1 : $datetodayA;
+
+        $datetodayB = deviceData::where('date', $date)->max('soilusage2');
+        $usageincB = $request->soilusage2 == 1 ? $datetodayB + 1 : $datetodayB;
+
+        $datetodayC = deviceData::where('date', $date)->max('soilusage3');
+        $usageincC = $request->soilusage3 == 1 ? $datetodayC + 1 : $datetodayC;
+        if(empty($presentdate) || $presentdate == "" || $presentdate == null ||$presentdate == []){
             deviceData::insert([
-                "usage"=> $request->usage,
+                "soilusage1"=> $request->soilusage1,
+                "soilusage2"=> $request->soilusage2,
+                "soilusage3"=> $request->soilusage3,
                 "date"=>$date]);
+                return response("Added new data for today");
         }
         else{
-deviceData::where("date", $date)->update(['usage'=>$usageinc]);
-        }
-        Log::info($usageinc);
-        return response()->json("added liter successfuly");
+deviceData::where("date", $date)->update(['soilusage1'=>$usageincA,
+'soilusage2'=>$usageincB,
+'soilusage3'=>$usageincC,]);
+}
+Log::info($presentdate);
+return response()->json("updated todays liter successfuly", );
 
 
     }
@@ -115,8 +127,11 @@ public function setSensor(Request $request)
 {
     $network = 11;
    $response = deviceSensor::where('network', 1)->update([
-        'pump'=>$request->relay,
-        'moisture'=>$request->moisture,
+       
+         'pump'=>$request->relay,
+        'moisture1'=>$request->moisture1,
+        'moisture2'=>$request->moisture2,
+        'moisture3'=>$request->moisture3,
         'waterlvl'=> $request->floating,
     ]);
     Log::info($request->all());
@@ -136,11 +151,14 @@ public function waterlvlmonitoring(Request $request){
     // $test =json_encode($request['floatsensor'],true);
     $test2 = json_decode($request['floatsensor']);
     // $test3 = json_decode($test2,true);
-    $response = deviceSensor::where('id', 10)->update([
+    $response = deviceSensor::where('network', 1)->update([
+       
         'pump'=>$request->relay,
-        'moisture'=>$request->moisture,
-        'waterlvl'=> $request->floating,
-    ]);
+       'moisture1'=>$request->moisture1,
+       'moisture2'=>$request->moisture2,
+       'moisture3'=>$request->moisture3,
+       'waterlvl'=> $request->floating,
+   ]);
     Log::info($request->all());
         if(!$response){
             return response("network failure");
@@ -149,4 +167,5 @@ public function waterlvlmonitoring(Request $request){
             // return response("sensor is being monitored");
         }
 }
+
 }
